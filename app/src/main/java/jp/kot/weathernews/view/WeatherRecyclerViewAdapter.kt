@@ -13,9 +13,7 @@ import jp.kot.weathernews.entity.Weather
 
 class WeatherRecyclerViewAdapter(private var weatherList: List<Weather>) : RecyclerView.Adapter<WeatherRecyclerViewAdapter.WeatherRecyclerViewHolder>() {
 
-    override fun getItemCount(): Int {
-        return weatherList.size
-    }
+    override fun getItemCount() = weatherList.size
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): WeatherRecyclerViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(viewType, null)
@@ -23,19 +21,19 @@ class WeatherRecyclerViewAdapter(private var weatherList: List<Weather>) : Recyc
     }
 
     override fun onBindViewHolder(holder: WeatherRecyclerViewHolder?, position: Int) {
-        holder?.setData(weatherList.get(position))
+        holder?.setData(weatherList[position])
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (position == 0) {
-            return R.layout.weather_item_row_top
+        return if (position == 0) {
+            R.layout.weather_item_row_top
         } else {
-            val weather = weatherList.get(position)
-            val weatherBef = weatherList.get(position - 1)
+            val weather = weatherList[position]
+            val weatherBef = weatherList[position - 1]
             if (TextUtils.equals(weather.date, weatherBef.date)) {
-                return R.layout.weather_item_row
+                R.layout.weather_item_row
             } else {
-                return R.layout.weather_item_row_top
+                R.layout.weather_item_row_top
             }
         }
     }

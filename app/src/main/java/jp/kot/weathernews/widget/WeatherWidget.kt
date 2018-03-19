@@ -29,7 +29,7 @@ class WeatherWidget : AppWidgetProvider() {
     override fun onDisabled(context: Context) {
     }
 
-    fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_24_hours)
         val orma = OrmaDatabase.builder(context).build()
         val weatherList = orma.selectFromWeather().toList()

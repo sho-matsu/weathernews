@@ -16,24 +16,26 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
-class GetWeatherTask(private val context: Context): AsyncTask<Void, Void, List<Weather>>() {
+class GetWeatherTask(private val context: Context) : AsyncTask<Void, Void, List<Weather>>() {
 
-    override fun doInBackground(vararg params: Void?): List<Weather> {
+    override fun doInBackground(vararg params: Void?): List<Weather>? {
         val lat = PrefUtil.getString(context, PrefConst.KEY_LATITUDE, "0")
         val lon = PrefUtil.getString(context, PrefConst.KEY_LONGITUDE, "0")
 
-        val urlBuilder = HttpUrl.parse(context.getString(R.string.weather_url))
-                .newBuilder()
-                .addQueryParameter("APPID", context.getString(R.string.weather_api_key))
-                .addQueryParameter("lat", lat)
-                .addQueryParameter("lon", lon)
+        val urlBuilder = HttpUrl.parse(context.getString(R.string.weather_url))?.let {
+            it.newBuilder().apply {
+                addQueryParameter("APPID", context.getString(R.string.weather_api_key))
+                addQueryParameter("lat", lat)
+                addQueryParameter("lon", lon)
+            }
+        } ?: return null
 
         val request = Request.Builder()
                 .url(urlBuilder.build())
                 .build()
 
         val response = OkHttpClient().newCall(request).execute()
-        val result = response.body().string()
+        val result = response.body()?.string()
 
         val jsonObject = JSONObject(result)
         val jsonArray = jsonObject.getJSONArray("list")
@@ -43,7 +45,7 @@ class GetWeatherTask(private val context: Context): AsyncTask<Void, Void, List<W
         val orma = OrmaDatabase.builder(context).build()
         orma.deleteAll()
         val weatherList = ArrayList<Weather>()
-        for (i in 0..jsonArray.length() - 1) {
+        for (i in 0 until jsonArray.length()) {
             try {
                 val weather = Weather()
                 val json = jsonArray.getJSONObject(i)
@@ -71,7 +73,7 @@ class GetWeatherTask(private val context: Context): AsyncTask<Void, Void, List<W
         return weatherList
     }
 
-    override fun onPostExecute(result: List<Weather>) {
+    override fun onPostExecute(result: List<Weather>?) {
         super.onPostExecute(result)
         EventBus.getDefault().post(GetWeatherFinishEvent(result))
     }

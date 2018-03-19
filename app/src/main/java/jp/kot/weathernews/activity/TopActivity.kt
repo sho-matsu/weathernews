@@ -74,15 +74,17 @@ class TopActivity: AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun checkLocationPermission() {
+    private fun checkLocationPermission() {
         requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == 1) {
             if (grantResults.size == 1 && grantResults[0] == PermissionChecker.PERMISSION_GRANTED) {
-                locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
-                locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+                if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
+                    locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
+                    locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+                }
             }
         }
     }
@@ -92,7 +94,7 @@ class TopActivity: AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         getWeather()
     }
 
-    fun getWeather() {
+    private fun getWeather() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
                 locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
@@ -106,10 +108,13 @@ class TopActivity: AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    @Suppress("unused")
     @Subscribe
     fun onGetWeatherFinish(event: GetWeatherFinishEvent) {
-        weatherListView?.adapter = WeatherRecyclerViewAdapter(event.list)
+        event.list?.let {
+            weatherListView?.adapter = WeatherRecyclerViewAdapter(it)
+            Log.d(javaClass.name, "weather draw completed")
+        } ?: Log.d(javaClass.name, "weather no data")
         swipeLayout?.isRefreshing = false
-        Log.d(javaClass.name, "weather draw completed")
     }
 }
