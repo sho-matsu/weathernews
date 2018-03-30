@@ -19,7 +19,7 @@ import jp.kot.weathernews.constant.PrefConst
 import jp.kot.weathernews.event.GetWeatherFinishEvent
 import jp.kot.weathernews.util.PrefUtil
 import jp.kot.weathernews.view.WeatherRecyclerViewAdapter
-import jp.kot.weathernews.viewmodel.TopViewModel
+import jp.kot.weathernews.viewmodel.WeatherPresenter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -43,7 +43,7 @@ class TopActivity: AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             Log.d("latitude", location?.latitude.toString())
             Log.d("longitude", location?.longitude.toString())
             locationManager?.removeUpdates(this)
-            TopViewModel(this@TopActivity).getWeather()
+            WeatherPresenter(this@TopActivity).getWeather()
         }
     }
 
